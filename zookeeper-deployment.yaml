@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: zookeeper
+  template:
+    metadata:
+      labels:
+        component: zookeeper
+    spec:
+      containers:
+      - name: zookeeper
+        image: pharosproduction/zookeeper_k8s:v4        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+          - containerPort: 2181
+        tty: true
+        livenessProbe:
+          exec:
+            command:
+              - /opt/check.sh
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command:
+              - /opt/check.sh
+          initialDelaySeconds: 30
+          periodSeconds: 5
+      imagePullSecrets:
+        - name: regcred
+      
